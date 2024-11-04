@@ -154,7 +154,7 @@ class LinearReparameterization(BaseVariationalLayer_):
                               self.prior_bias_mu, self.prior_bias_sigma)
         return kl
 
-    def forward(self, input, return_kl=True):
+    def forward(self, input, return_kl=True, return_dist=False):
         if self.dnn_to_bnn_flag:
             return_kl = False
         sigma_weight = torch.log1p(torch.exp(self.rho_weight))
@@ -196,6 +196,12 @@ class LinearReparameterization(BaseVariationalLayer_):
             else:
                 kl = kl_weight
 
-            return out, kl
-
+            if return_dist:
+                if bias:
+                    return out, kl, self.mu_weight, sigma_weight, self.mu_bias, sigma_bias
+                else:
+                    return out, kl, self.mu_weight, sigma_weight
+            else:
+                return out, kl
+        
         return out
